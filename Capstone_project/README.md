@@ -73,5 +73,4 @@ This stack includes the technologies explicitly mentioned and those implicitly r
 - **Cargo:** Rust's build system and package manager.
 - **Git & GitHub/GitLab:** For version control.
 - **`sqlx-cli`:** A command-line utility for managing database migrations (creating, applying, reverting).
-
 ---
