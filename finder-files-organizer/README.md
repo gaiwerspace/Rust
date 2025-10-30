@@ -45,7 +45,8 @@ USAGE:
 
 Examples of available commands:
 
-Test with the basic sorting options first.
+Test with the basic sorting options first:
+
 Sort by name (no tags needed)
 ./target/release/file-organizer /YOUR_SELECTED_FOLDER -s name
 
