@@ -57,6 +57,9 @@ Sort by size
 Sort by type
 ./target/release/file-organizer /YOUR_SELECTED_FOLDER -s type
 
+Recursively sort all folders in YOUR_SELECTED_FOLDER by type
+./target/release/file-organizer /YOUR_SELECTED_FOLDER -r
+
 Examples (sorting the folders and files in the folder Downloads):
 
 Sort by name (no tags needed)
@@ -70,7 +73,6 @@ Sort by size
 
 Sort by type
 ./target/release/file-organizer /Downloads -s type
-
 
 After the first launch, macOS will ask you to grant the program permission to perform the relevant actions.
 Please grant it the following rights:
