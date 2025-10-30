@@ -38,8 +38,9 @@ USAGE:
       <PATH>    Directory to open and sort
 
       OPTIONS:
-        -s, --sort <SORT>     Sort by: name, modified, created, size, type, tags [default: name]
+        -s, --sort <SORT>     Sort by: name, modified, created, size, type, tags [default: type]
         -o, --order <ORDER>   Order: asc, desc [default: asc]
+        -r, --recursive       Recursively sort all nested folders
         -v, --verbose         Verbose output
 
 Examples of available commands:
