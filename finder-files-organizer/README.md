@@ -31,34 +31,44 @@ After running the command cargo build --release, you will have a binary file tha
 
 Select the folder in which you want to sort the folders and files and execute the command.
 
+USAGE:
+  finder-sorter <PATH> [OPTIONS]
+
+    ARGUMENTS:
+      <PATH>    Directory to open and sort
+
+      OPTIONS:
+        -s, --sort <SORT>     Sort by: name, modified, created, size, type, tags [default: name]
+        -o, --order <ORDER>   Order: asc, desc [default: asc]
+        -v, --verbose         Verbose output
+
 Examples of available commands:
 
-Test with the basic sorting options first:
+Test with the basic sorting options first.
+Sort by name (no tags needed)
+./target/release/file-organizer /YOUR_SELECTED_FOLDER -s name
 
-# Sort by name (no tags needed)
-./target/release/file-organizer /YOUR_FOLDER -s name
+Sort by modification date
+./target/release/file-organizer /YOUR_SELECTED_FOLDER -s modified -o desc
 
-# Sort by modification date
-./target/release/file-organizer /YOUR_FOLDER -s modified -o desc
+Sort by size
+./target/release/file-organizer /YOUR_SELECTED_FOLDER -s size -o desc
 
-# Sort by size
-./target/release/file-organizer /YOUR_FOLDER -s size -o desc
-
-# Sort by type
-./target/release/file-organizer /YOUR_FOLDER -s type
+Sort by type
+./target/release/file-organizer /YOUR_SELECTED_FOLDER -s type
 
 Examples (sorting the folders and files in the folder Downloads):
 
-# Sort by name (no tags needed)
+Sort by name (no tags needed)
 ./target/release/file-organizer /Downloads -s name
 
-# Sort by modification date
+Sort by modification date
 ./target/release/file-organizer /Downloads -s modified -o desc
 
-# Sort by size
+Sort by size
 ./target/release/file-organizer /Downloads -s size -o desc
 
-# Sort by type
+Sort by type
 ./target/release/file-organizer /Downloads -s type
 
 
