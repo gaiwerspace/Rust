@@ -1,9 +1,13 @@
 use clap::{Parser, ValueEnum};
 use std::fs;
+use std::io;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::thread;
-use std::time::Duration;
+use std::time::Instant;
+
+// ============================================================================
+// Enums and Type Definitions
+// ============================================================================
 
 #[derive(Debug, Clone, ValueEnum)]
 #[value(rename_all = "lowercase")]
@@ -17,32 +21,26 @@ enum SortBy {
 }
 
 impl SortBy {
-    fn key_code(&self) -> &'static str {
+    const fn key_code(&self) -> &'static str {
         match self {
-            SortBy::Name => "18",     // 1 key
-            SortBy::Type => "19",     // 2 key
-            SortBy::Modified => "20", // 3 key
-            SortBy::Created => "21",  // 4 key
-            SortBy::Size => "23",     // 5 key
-            SortBy::Tags => "22",     // 6 key
+            Self::Name => "18",
+            Self::Type => "19",
+            Self::Modified => "20",
+            Self::Created => "21",
+            Self::Size => "23",
+            Self::Tags => "22",
         }
     }
 
-    fn sort_column(&self) -> &'static str {
+    const fn sort_column(&self) -> &'static str {
         match self {
-            SortBy::Name => "name column",
-            SortBy::Type => "kind column",
-            SortBy::Modified => "modification date column",
-            SortBy::Created => "creation date column",
-            SortBy::Size => "size column",
-            SortBy::Tags => "label column",
+            Self::Name => "name column",
+            Self::Type => "kind column",
+            Self::Modified => "modification date column",
+            Self::Created => "creation date column",
+            Self::Size => "size column",
+            Self::Tags => "label column",
         }
-    }
-}
-
-impl From<&SortBy> for &'static str {
-    fn from(sort_by: &SortBy) -> Self {
-        sort_by.key_code()
     }
 }
 
@@ -54,24 +52,22 @@ enum SortOrder {
 }
 
 impl SortOrder {
-    fn direction(&self) -> &'static str {
+    const fn direction(&self) -> &'static str {
         match self {
-            SortOrder::Asc => "normal",
-            SortOrder::Desc => "reversed",
+            Self::Asc => "normal",
+            Self::Desc => "reversed",
         }
     }
 }
 
-impl From<&SortOrder> for &'static str {
-    fn from(order: &SortOrder) -> Self {
-        order.direction()
-    }
-}
+// ============================================================================
+// CLI Arguments
+// ============================================================================
 
-/// Sort files in macOS Finder
 #[derive(Parser, Debug)]
 #[command(name = "finder-sorter")]
-#[command(about = "Finder Sorter - Sort files in macOS Finder", long_about = None)]
+#[command(about = "Finder Sorter - Sort and organize files in macOS Finder")]
+#[command(version)]
 struct Args {
     /// Directory to open and sort
     #[arg(value_parser = parse_path)]
@@ -85,69 +81,91 @@ struct Args {
     #[arg(short, long, value_enum, default_value_t = SortOrder::Asc)]
     order: SortOrder,
 
-    /// Verbose output
+    /// Enable verbose output
     #[arg(short, long)]
     verbose: bool,
 
     /// Recursively sort all nested folders
     #[arg(short, long)]
     recursive: bool,
+
+    /// WARNING: This changes the folder structure! Organize files into folders by extension
+    #[arg(long)]
+    pack_to_folders: bool,
 }
 
 fn parse_path(s: &str) -> Result<PathBuf, String> {
-    let path = if s.starts_with("~/") {
-        if let Ok(home) = std::env::var("HOME") {
-            PathBuf::from(s.replacen("~", &home, 1))
-        } else {
-            PathBuf::from(s)
-        }
+    let path = if let Some(rest) = s.strip_prefix("~/") {
+        std::env::var("HOME")
+            .map(|home| PathBuf::from(home).join(rest))
+            .unwrap_or_else(|_| PathBuf::from(s))
     } else {
         PathBuf::from(s)
     };
     Ok(path)
 }
 
+// ============================================================================
+// Finder Sorter
+// ============================================================================
+
 struct FinderSorter {
     verbose: bool,
 }
 
 impl FinderSorter {
-    fn new(verbose: bool) -> Self {
+    const fn new(verbose: bool) -> Self {
         Self { verbose }
     }
 
-    fn execute_applescript(&self, script: &str) -> Result<String, String> {
+    fn log(&self, message: impl AsRef<str>) {
         if self.verbose {
-            println!(" Executing AppleScript...");
-            println!("{script}");
+            eprintln!("{}", message.as_ref());
         }
+    }
+
+    fn validate_directory(&self, path: &Path) -> Result<(), String> {
+        if !path.exists() {
+            return Err(format!("Path does not exist: {}", path.display()));
+        }
+        if !path.is_dir() {
+            return Err(format!("Path is not a directory: {}", path.display()));
+        }
+        Ok(())
+    }
+
+    fn execute_applescript(&self, script: &str) -> Result<String, String> {
+        self.log(" Executing AppleScript...");
+        self.log(script);
 
         let output = Command::new("osascript")
-            .arg("-e")
-            .arg(script)
+            .args(["-e", script])
             .output()
             .map_err(|e| format!("Failed to execute AppleScript: {e}"))?;
 
         if output.status.success() {
             Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
         } else {
-            let error = String::from_utf8_lossy(&output.stderr).trim().to_string();
-            Err(format!("AppleScript error: {error}"))
+            let error = String::from_utf8_lossy(&output.stderr);
+            Err(format!("AppleScript error: {}", error.trim()))
         }
     }
 
     fn get_all_subdirectories(&self, root: &Path) -> Result<Vec<PathBuf>, String> {
-        let mut directories = vec![root.to_path_buf()];
+        let mut directories = Vec::with_capacity(16);
+        directories.push(root.to_path_buf());
 
-        fn visit_dirs(dir: &Path, dirs: &mut Vec<PathBuf>) -> std::io::Result<()> {
-            if dir.is_dir() {
-                for entry in fs::read_dir(dir)? {
-                    let entry = entry?;
-                    let path = entry.path();
-                    if path.is_dir() {
-                        dirs.push(path.clone());
-                        visit_dirs(&path, dirs)?;
-                    }
+        fn visit_dirs(dir: &Path, dirs: &mut Vec<PathBuf>) -> io::Result<()> {
+            if !dir.is_dir() {
+                return Ok(());
+            }
+
+            for entry in fs::read_dir(dir)? {
+                let entry = entry?;
+                let path = entry.path();
+                if path.is_dir() {
+                    dirs.push(path.clone());
+                    visit_dirs(&path, dirs)?;
                 }
             }
             Ok(())
@@ -159,130 +177,225 @@ impl FinderSorter {
         Ok(directories)
     }
 
+    fn build_applescript(&self, template: &str, replacements: &[(&str, &str)]) -> String {
+        let mut script = template.to_string();
+        for (placeholder, value) in replacements {
+            script = script.replace(placeholder, value);
+        }
+        script
+    }
+
     fn set_folder_sort_preferences_background(
         &self,
         path: &Path,
         sort_by: &SortBy,
         order: &SortOrder,
     ) -> Result<(), String> {
-        if !path.exists() {
-            return Err(format!("Path does not exist: {}", path.display()));
-        }
+        self.validate_directory(path)?;
 
-        if !path.is_dir() {
-            return Err(format!("Path is not a directory: {}", path.display()));
-        }
-
-        let dir_str = path.to_string_lossy();
-        let sort_column = sort_by.sort_column();
-        let sort_direction = order.direction();
-
-        let script = include_str!("../scripts/background_sort.applescript")
-            .replace("{FOLDER_PATH}", &dir_str)
-            .replace("{SORT_COLUMN}", sort_column)
-            .replace("{SORT_DIRECTION}", sort_direction);
+        let script = self.build_applescript(
+            include_str!("../scripts/background_sort.applescript"),
+            &[
+                ("{FOLDER_PATH}", &path.to_string_lossy()),
+                ("{SORT_COLUMN}", sort_by.sort_column()),
+                ("{SORT_DIRECTION}", order.direction()),
+            ],
+        );
 
         self.execute_applescript(&script)?;
         Ok(())
     }
 
-    pub fn sort_finder_window(
+    fn sort_finder_window(
         &self,
         path: &Path,
         sort_by: &SortBy,
         order: &SortOrder,
     ) -> Result<(), String> {
-        if !path.exists() {
-            return Err(format!("Path does not exist: {}", path.display()));
-        }
+        self.validate_directory(path)?;
 
-        if !path.is_dir() {
-            return Err(format!("Path is not a directory: {}", path.display()));
-        }
+        eprintln!("Opening folder: {}", path.display());
+        eprintln!("Sort by: {sort_by:?}");
+        eprintln!("Order: {order:?}");
 
         let dir_str = path.to_string_lossy();
 
-        println!("Opening folder: {}", path.display());
-        println!("Sort by: {sort_by:?}");
-        println!("Order: {order:?}");
-
         // Step 1: Open folder
-        let open_script =
-            include_str!("../scripts/open_folder.applescript").replace("{FOLDER_PATH}", &dir_str);
-
+        let open_script = self.build_applescript(
+            include_str!("../scripts/open_folder.applescript"),
+            &[("{FOLDER_PATH}", &dir_str)],
+        );
         self.execute_applescript(&open_script)?;
-        thread::sleep(Duration::from_millis(300));
 
-        // Step 2: Use keyboard shortcut to sort
-        let key_code: &str = sort_by.into();
-
-        let sort_script =
-            include_str!("../scripts/sort_keyboard.applescript").replace("{KEY_CODE}", key_code);
-
+        // Step 2: Sort by key code
+        let sort_script = self.build_applescript(
+            include_str!("../scripts/sort_keyboard.applescript"),
+            &[("{KEY_CODE}", sort_by.key_code())],
+        );
         self.execute_applescript(&sort_script)?;
-        thread::sleep(Duration::from_millis(500));
 
-        // Step 3: Reversing sort order
+        // Step 3: Reverse sort order if needed
         if matches!(order, SortOrder::Desc) {
-            println!("Reversing sort order...");
-
+            eprintln!("Reversing sort order...");
             let reverse_script = include_str!("../scripts/reverse_sort.applescript");
-
             let _ = self.execute_applescript(reverse_script);
         }
 
-        println!("Finder window sorted successfully!");
+        eprintln!("Finder window sorted successfully!");
         Ok(())
     }
 
-    pub fn sort_recursively(
+    fn sort_recursively(
         &self,
         path: &Path,
         sort_by: &SortBy,
         order: &SortOrder,
     ) -> Result<(), String> {
-        println!("Finding all subdirectories...");
+        eprintln!("Finding all subdirectories...");
         let directories = self.get_all_subdirectories(path)?;
 
-        println!(
-            "Found {} director{} to sort",
-            directories.len(),
-            if directories.len() == 1 { "y" } else { "ies" }
+        let dir_count = directories.len();
+        eprintln!(
+            "Found {} director{}",
+            dir_count,
+            if dir_count == 1 { "y" } else { "ies" }
         );
 
         for (index, dir) in directories.iter().enumerate() {
-            println!(
+            eprintln!(
                 "[{}/{}] Processing: {}",
                 index + 1,
-                directories.len(),
+                dir_count,
                 dir.display()
             );
-
             self.set_folder_sort_preferences_background(dir, sort_by, order)?;
         }
 
-        println!("All folders sorted!");
+        eprintln!("All folders sorted!");
         Ok(())
     }
 }
 
-fn main() {
-    let args = Args::parse();
+// ============================================================================
+// File Organizer
+// ============================================================================
 
-    let sorter = FinderSorter::new(args.verbose);
+struct FileOrganizer {
+    verbose: bool,
+}
 
-    let result = if args.recursive {
-        println!("Recursive mode enabled - sorting all nested folders\n");
-        sorter.sort_recursively(&args.path, &args.sort, &args.order)
-    } else {
-        sorter.sort_finder_window(&args.path, &args.sort, &args.order)
-    };
+impl FileOrganizer {
+    const fn new(verbose: bool) -> Self {
+        Self { verbose }
+    }
 
-    match result {
-        Ok(_) => println!("\nDone!!!"),
-        Err(e) => {
-            eprintln!("\nError: {e}");
-            std::process::exit(1);
+    fn log(&self, message: impl AsRef<str>) {
+        if self.verbose {
+            eprintln!("{}", message.as_ref());
         }
     }
+
+    fn organize(&self, dir_path: &Path) -> Result<(usize, usize), String> {
+        if !dir_path.exists() {
+            return Err(format!(
+                "Directory \"{}\" doesn't exist",
+                dir_path.display()
+            ));
+        }
+
+        if !dir_path.is_dir() {
+            return Err(format!(
+                "Path \"{}\" is not a directory",
+                dir_path.display()
+            ));
+        }
+
+        let entries = fs::read_dir(dir_path)
+            .map_err(|e| format!("Error opening directory \"{}\": {}", dir_path.display(), e))?;
+
+        let mut files_moved = 0;
+        let mut files_skipped = 0;
+
+        for entry in entries {
+            let file = entry.map_err(|e| format!("Error reading directory entry: {}", e))?;
+            let file_path = file.path();
+
+            if file_path.is_dir() {
+                self.log(format!("Skipping directory: {}", file_path.display()));
+                files_skipped += 1;
+                continue;
+            }
+
+            let extension = match file_path.extension().and_then(|e| e.to_str()) {
+                Some(ext) => ext.to_lowercase(),
+                None => {
+                    eprintln!("Skipping file without extension: {}", file_path.display());
+                    files_skipped += 1;
+                    continue;
+                }
+            };
+
+            let extension_dir = dir_path.join(&extension);
+            Self::create_dir_if_not_exists(&extension_dir)?;
+
+            let destination = extension_dir.join(file.file_name());
+            Self::move_file(&file_path, &destination)?;
+            files_moved += 1;
+        }
+
+        Ok((files_moved, files_skipped))
+    }
+
+    fn create_dir_if_not_exists(dir_path: &Path) -> Result<(), String> {
+        if !dir_path.exists() {
+            fs::create_dir(dir_path).map_err(|e| {
+                format!("Error creating directory \"{}\": {}", dir_path.display(), e)
+            })?;
+        }
+        Ok(())
+    }
+
+    fn move_file(from: &Path, to: &Path) -> Result<(), String> {
+        fs::rename(from, to).map_err(|e| {
+            format!(
+                "Error moving \"{}\" to \"{}\": {}",
+                from.display(),
+                to.display(),
+                e
+            )
+        })
+    }
+}
+
+// ============================================================================
+// Main
+// ============================================================================
+
+fn main() -> Result<(), String> {
+    let args = Args::parse();
+
+    if args.pack_to_folders {
+        eprintln!("WARNING: This operation will reorganize your directory structure!");
+        eprintln!("Organizing files in: {}\n", args.path.display());
+
+        let start = Instant::now();
+        let organizer = FileOrganizer::new(args.verbose);
+        let (moved, skipped) = organizer.organize(&args.path)?;
+
+        eprintln!("\nFiles moved: {}, skipped: {}", moved, skipped);
+        eprintln!("Completed in {:.3}s", start.elapsed().as_secs_f64());
+    } else {
+        let sorter = FinderSorter::new(args.verbose);
+
+        if args.recursive {
+            eprintln!("Recursive mode enabled - sorting all nested folders\n");
+            sorter.sort_recursively(&args.path, &args.sort, &args.order)?;
+        } else {
+            sorter.sort_finder_window(&args.path, &args.sort, &args.order)?;
+        }
+
+        eprintln!("\nTask successfully completed!");
+    }
+
+    Ok(())
 }
