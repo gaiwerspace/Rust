@@ -47,32 +47,41 @@ Examples of available commands:
 
 Test with the basic sorting options first.
 Sort by name (no tags needed)
+
 ./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -s name
 
 Sort by modification date
+
 ./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -s modified -o desc
 
 Sort by size
+
 ./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -s size -o desc
 
 Sort by type
+
 ./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -s type
 
 Recursively sort all folders in YOUR_SELECTED_FOLDER by type
+
 ./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -r
 
 Examples (sorting the folders and files in the folder Downloads):
 
 Sort by name (no tags needed)
+
 ./target/release/finder-files-organizer /Downloads -s name
 
 Sort by modification date
+
 ./target/release/finder-files-organizer /Downloads -s modified -o desc
 
 Sort by size
+
 ./target/release/finder-files-organizer /Downloads -s size -o desc
 
 Sort by type
+
 ./target/release/finder-files-organizer /Downloads -s type
 
 After the first launch, macOS will ask you to grant the program permission to perform the relevant actions.
