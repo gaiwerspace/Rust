@@ -44,8 +44,8 @@ USAGE:
         -v, --verbose         Verbose output
         -h, --help            Print help information
         -V, --version         Print version of the programm
-            --pack-to-folders WARNING: This changes the folder structure!!! Organize files into folders by 
-                              their extensions.
+            --pack-to-folders WARNING: This changes the folder structure. Don't
+                              use unless you really need it! Organize files into folders by their extensions.
 
 Examples of available commands:
 
