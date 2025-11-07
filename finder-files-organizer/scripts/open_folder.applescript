@@ -1,9 +1,9 @@
-tell application "Finder"
-    activate
-    set theFolder to POSIX file "{FOLDER_PATH}" as alias
-    open theFolder
-    delay 0.8
-    tell front window
-        set current view to list view
+on run argv
+    set folderPath to item 1 of argv
+
+    tell application "Finder"
+        activate
+        open POSIX file folderPath as alias
+        set target of front window to POSIX file folderPath as alias
     end tell
-end tell
+end run

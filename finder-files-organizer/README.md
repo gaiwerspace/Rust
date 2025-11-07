@@ -42,10 +42,17 @@ USAGE:
         -o, --order <ORDER>   Order: asc, desc [default: asc]
         -r, --recursive       Recursively sort all nested folders
         -v, --verbose         Verbose output
+        -h, --help            Print help information
+        -V, --version         Print version of the programm
+            --pack-to-folders WARNING: This changes the folder structure!!! Organize files into folders by 
+                              their extensions.
 
 Examples of available commands:
 
 Test with the basic sorting options first.
+Sort files in the test folder inside the project folder
+cargo run -- test_directory --sort name --order asc
+
 Sort by name (no tags needed):
 
 ./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -s name

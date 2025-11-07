@@ -4,18 +4,19 @@ on run argv
     set sortDir to item 3 of argv
     
     tell application "Finder"
+        activate
         try
             set targetFolder to POSIX file folderPath as alias
             
-            -- Open the folder in the background (no activate)
+            -- Open the folder
             open targetFolder
-            delay 0.3
+            delay 0.5
             
             set targetWindow to front window
             set target of targetWindow to targetFolder
             set current view of targetWindow to list view
             
-            delay 0.2
+            delay 0.3
             
             -- Workaround for Finder AppleScript bugs: use column id syntax
             tell list view options of targetWindow
@@ -89,7 +90,7 @@ on run argv
             set bounds of targetWindow to bounds of targetWindow
             
         on error errMsg
-            error "Failed to set sort preferences: " & errMsg
+            error "Failed to open and sort folder: " & errMsg
         end try
     end tell
 end run
