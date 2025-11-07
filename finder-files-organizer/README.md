@@ -25,14 +25,14 @@ cargo build --release
 ### Preparation
 
 After running the command cargo build --release, you will have a binary file that you can use it from the folder:
-./target/release/finder-finder-files-organizer
+./target/release/finder-files-organizer
 
 ### Use
 
 Select the folder in which you want to sort the folders and files and execute the command.
 
 USAGE:
-  finder-sorter <PATH> [OPTIONS]
+  finder-files-organizer <PATH> [OPTIONS]
 
     ARGUMENTS:
       <PATH>    Directory to open and sort
