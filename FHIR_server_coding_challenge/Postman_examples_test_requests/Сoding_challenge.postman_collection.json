@@ -1,0 +1,936 @@
+{
+  "info": {
+    "_postman_id": "18c9de15-4316-442e-bfe6-c2cd7638ff61",
+    "name": "Firemetrics coding challenge",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "8644647"
+  },
+  "item": [
+    {
+      "name": "Create a New Patient_1",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"text\": {\n    \"status\": \"generated\",\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">Test patient with comprehensive data</div>\"\n  },\n  \"identifier\": [\n    {\n      \"use\": \"usual\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"MR\",\n            \"display\": \"Medical Record Number\"\n          }\n        ]\n      },\n      \"system\": \"urn:oid:1.2.36.146.595.217.0.1\",\n      \"value\": \"TEST-123456\",\n      \"period\": {\n        \"start\": \"2026-02-07\"\n      },\n      \"assigner\": {\n        \"display\": \"Test Healthcare System\"\n      }\n    },\n    {\n      \"use\": \"official\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"SS\",\n            \"display\": \"Social Security Number\"\n          }\n        ]\n      },\n      \"system\": \"http://hl7.org/fhir/sid/us-ssn\",\n      \"value\": \"123-45-6789\"\n    }\n  ],\n  \"active\": true,\n  \"name\": [\n    {\n      \"use\": \"official\",\n      \"family\": \"Schmidt\",\n      \"given\": [\"Anna\", \"Maria\"],\n      \"prefix\": [\"Dr.\"],\n      \"suffix\": [\"PhD\"]\n    },\n    {\n      \"use\": \"usual\",\n      \"given\": [\"Anna\"]\n    },\n    {\n      \"use\": \"maiden\",\n      \"family\": \"Mueller\",\n      \"given\": [\"Anna\", \"Maria\"],\n      \"period\": {\n        \"end\": \"2015\"\n      }\n    },\n    {\n      \"use\": \"nickname\",\n      \"given\": [\"Annie\"]\n    }\n  ],\n  \"telecom\": [\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-391-555-1234\",\n      \"use\": \"home\",\n      \"rank\": 2\n    },\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-391-555-5678\",\n      \"use\": \"work\",\n      \"rank\": 1\n    },\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-171-555-9876\",\n      \"use\": \"mobile\",\n      \"rank\": 1\n    },\n    {\n      \"system\": \"email\",\n      \"value\": \"anna.schmidt@example.de\",\n      \"use\": \"home\"\n    },\n    {\n      \"system\": \"email\",\n      \"value\": \"a.schmidt@work-example.de\",\n      \"use\": \"work\"\n    },\n    {\n      \"system\": \"fax\",\n      \"value\": \"+49-391-555-1235\",\n      \"use\": \"work\"\n    }\n  ],\n  \"gender\": \"female\",\n  \"birthDate\": \"1985-03-15\",\n  \"_birthDate\": {\n    \"extension\": [\n      {\n        \"url\": \"http://hl7.org/fhir/StructureDefinition/patient-birthTime\",\n        \"valueDateTime\": \"1985-03-15T08:30:00+01:00\"\n      }\n    ]\n  },\n  \"deceasedBoolean\": false,\n  \"address\": [\n    {\n      \"use\": \"home\",\n      \"type\": \"both\",\n      \"text\": \"Hauptstraße 123, 39164 Wanzleben-Börde, Germany\",\n      \"line\": [\"Hauptstraße 123\", \"Apartment 4B\"],\n      \"city\": \"Wanzleben-Börde\",\n      \"district\": \"Börde\",\n      \"state\": \"Saxony-Anhalt\",\n      \"postalCode\": \"39164\",\n      \"country\": \"DE\",\n      \"period\": {\n        \"start\": \"2020-01-01\"\n      }\n    },\n    {\n      \"use\": \"work\",\n      \"type\": \"physical\",\n      \"line\": [\"Universitätsplatz 1\"],\n      \"city\": \"Magdeburg\",\n      \"state\": \"Saxony-Anhalt\",\n      \"postalCode\": \"39106\",\n      \"country\": \"DE\"\n    },\n    {\n      \"use\": \"old\",\n      \"type\": \"both\",\n      \"line\": [\"Alte Straße 45\"],\n      \"city\": \"Berlin\",\n      \"postalCode\": \"10115\",\n      \"country\": \"DE\",\n      \"period\": {\n        \"start\": \"2010-06-01\",\n        \"end\": \"2019-12-31\"\n      }\n    }\n  ],\n  \"maritalStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/v3-MaritalStatus\",\n        \"code\": \"M\",\n        \"display\": \"Married\"\n      }\n    ]\n  },\n  \"multipleBirthBoolean\": false,\n  \"photo\": [\n    {\n      \"contentType\": \"image/jpeg\",\n      \"url\": \"https://example.org/patient-photo.jpg\",\n      \"title\": \"Patient Photo\"\n    }\n  ],\n  \"contact\": [\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n              \"code\": \"C\",\n              \"display\": \"Emergency Contact\"\n            }\n          ]\n        },\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n              \"code\": \"HUSB\",\n              \"display\": \"husband\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Schmidt\",\n        \"given\": [\"Thomas\"]\n      },\n      \"telecom\": [\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-171-555-4321\",\n          \"use\": \"mobile\"\n        },\n        {\n          \"system\": \"email\",\n          \"value\": \"thomas.schmidt@example.de\"\n        }\n      ],\n      \"address\": {\n        \"use\": \"home\",\n        \"line\": [\"Hauptstraße 123\"],\n        \"city\": \"Wanzleben-Börde\",\n        \"state\": \"Saxony-Anhalt\",\n        \"postalCode\": \"39164\",\n        \"country\": \"DE\"\n      },\n      \"gender\": \"male\",\n      \"period\": {\n        \"start\": \"2015-06-20\"\n      }\n    },\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n              \"code\": \"N\",\n              \"display\": \"Next-of-Kin\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Mueller\",\n        \"given\": [\"Helga\"]\n      },\n      \"telecom\": [\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-391-555-7777\",\n          \"use\": \"home\"\n        }\n      ],\n      \"gender\": \"female\",\n      \"organization\": {\n        \"display\": \"Mother\"\n      }\n    }\n  ],\n  \"communication\": [\n    {\n      \"language\": {\n        \"coding\": [\n          {\n            \"system\": \"urn:ietf:bcp:47\",\n            \"code\": \"de\",\n            \"display\": \"German\"\n          }\n        ],\n        \"text\": \"German\"\n      },\n      \"preferred\": true\n    },\n    {\n      \"language\": {\n        \"coding\": [\n          {\n            \"system\": \"urn:ietf:bcp:47\",\n            \"code\": \"en\",\n            \"display\": \"English\"\n          }\n        ],\n        \"text\": \"English\"\n      },\n      \"preferred\": false\n    }\n  ],\n  \"generalPractitioner\": [\n    {\n      \"reference\": \"Practitioner/example\",\n      \"display\": \"Dr. med. Hans Weber\"\n    }\n  ],\n  \"managingOrganization\": {\n    \"reference\": \"Organization/example\",\n    \"display\": \"Test Healthcare System\"\n  },\n  \"link\": [\n    {\n      \"other\": {\n        \"reference\": \"RelatedPerson/example\"\n      },\n      \"type\": \"seealso\"\n    }\n  ]\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create a New Patient_2",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"text\": {\n    \"status\": \"generated\",\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">Pediatric patient - teenager with comprehensive medical history</div>\"\n  },\n  \"identifier\": [\n    {\n      \"use\": \"usual\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"MR\",\n            \"display\": \"Medical Record Number\"\n          }\n        ]\n      },\n      \"system\": \"urn:oid:1.2.36.146.595.217.0.1\",\n      \"value\": \"PEDS-789012\",\n      \"period\": {\n        \"start\": \"2009-04-20\"\n      },\n      \"assigner\": {\n        \"display\": \"Klinikum Magdeburg\"\n      }\n    },\n    {\n      \"use\": \"official\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"NI\",\n            \"display\": \"National unique individual identifier\"\n          }\n        ]\n      },\n      \"system\": \"http://fhir.de/sid/bundeseinheitliche-vorgangsnummer\",\n      \"value\": \"987-654-3210\"\n    }\n  ],\n  \"active\": true,\n  \"name\": [\n    {\n      \"use\": \"official\",\n      \"family\": \"Hoffmann\",\n      \"given\": [\"Lukas\", \"Friedrich\"]\n    },\n    {\n      \"use\": \"usual\",\n      \"given\": [\"Lukas\"]\n    },\n    {\n      \"use\": \"nickname\",\n      \"given\": [\"Luke\"]\n    }\n  ],\n  \"telecom\": [\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-391-555-8888\",\n      \"use\": \"home\",\n      \"rank\": 1\n    },\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-151-555-2468\",\n      \"use\": \"mobile\",\n      \"rank\": 2\n    },\n    {\n      \"system\": \"email\",\n      \"value\": \"lukas.hoffmann@example.de\",\n      \"use\": \"home\"\n    }\n  ],\n  \"gender\": \"male\",\n  \"birthDate\": \"2009-04-20\",\n  \"_birthDate\": {\n    \"extension\": [\n      {\n        \"url\": \"http://hl7.org/fhir/StructureDefinition/patient-birthTime\",\n        \"valueDateTime\": \"2009-04-20T14:15:00+02:00\"\n      }\n    ]\n  },\n  \"deceasedBoolean\": false,\n  \"address\": [\n    {\n      \"use\": \"home\",\n      \"type\": \"both\",\n      \"text\": \"Breiter Weg 45, 39104 Magdeburg, Germany\",\n      \"line\": [\"Breiter Weg 45\", \"3rd Floor\"],\n      \"city\": \"Magdeburg\",\n      \"district\": \"Altstadt\",\n      \"state\": \"Saxony-Anhalt\",\n      \"postalCode\": \"39104\",\n      \"country\": \"DE\",\n      \"period\": {\n        \"start\": \"2009-04-20\"\n      }\n    }\n  ],\n  \"maritalStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/v3-MaritalStatus\",\n        \"code\": \"S\",\n        \"display\": \"Never Married\"\n      }\n    ]\n  },\n  \"multipleBirthBoolean\": true,\n  \"multipleBirthInteger\": 1,\n  \"photo\": [\n    {\n      \"contentType\": \"image/jpeg\",\n      \"url\": \"https://example.org/patient-lukas-photo.jpg\",\n      \"title\": \"School Photo 2024\"\n    }\n  ],\n  \"contact\": [\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n              \"code\": \"C\",\n              \"display\": \"Emergency Contact\"\n            }\n          ]\n        },\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n              \"code\": \"MTH\",\n              \"display\": \"mother\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Hoffmann\",\n        \"given\": [\"Sabine\"]\n      },\n      \"telecom\": [\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-391-555-8888\",\n          \"use\": \"home\"\n        },\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-160-555-7654\",\n          \"use\": \"mobile\"\n        },\n        {\n          \"system\": \"email\",\n          \"value\": \"sabine.hoffmann@example.de\"\n        }\n      ],\n      \"address\": {\n        \"use\": \"home\",\n        \"line\": [\"Breiter Weg 45\"],\n        \"city\": \"Magdeburg\",\n        \"state\": \"Saxony-Anhalt\",\n        \"postalCode\": \"39104\",\n        \"country\": \"DE\"\n      },\n      \"gender\": \"female\"\n    },\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n              \"code\": \"C\",\n              \"display\": \"Emergency Contact\"\n            }\n          ]\n        },\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n              \"code\": \"FTH\",\n              \"display\": \"father\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Hoffmann\",\n        \"given\": [\"Michael\"]\n      },\n      \"telecom\": [\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-391-555-8889\",\n          \"use\": \"work\"\n        },\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-170-555-3333\",\n          \"use\": \"mobile\"\n        },\n        {\n          \"system\": \"email\",\n          \"value\": \"michael.hoffmann@example.de\"\n        }\n      ],\n      \"address\": {\n        \"use\": \"home\",\n        \"line\": [\"Breiter Weg 45\"],\n        \"city\": \"Magdeburg\",\n        \"state\": \"Saxony-Anhalt\",\n        \"postalCode\": \"39104\",\n        \"country\": \"DE\"\n      },\n      \"gender\": \"male\"\n    },\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n              \"code\": \"TWIN\",\n              \"display\": \"twin\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Hoffmann\",\n        \"given\": [\"Emma\", \"Marie\"]\n      },\n      \"gender\": \"female\",\n      \"organization\": {\n        \"display\": \"Twin Sister\"\n      }\n    }\n  ],\n  \"communication\": [\n    {\n      \"language\": {\n        \"coding\": [\n          {\n            \"system\": \"urn:ietf:bcp:47\",\n            \"code\": \"de\",\n            \"display\": \"German\"\n          }\n        ],\n        \"text\": \"German\"\n      },\n      \"preferred\": true\n    },\n    {\n      \"language\": {\n        \"coding\": [\n          {\n            \"system\": \"urn:ietf:bcp:47\",\n            \"code\": \"en\",\n            \"display\": \"English\"\n          }\n        ],\n        \"text\": \"English\"\n      },\n      \"preferred\": false\n    }\n  ],\n  \"generalPractitioner\": [\n    {\n      \"reference\": \"Practitioner/pediatric-001\",\n      \"display\": \"Dr. med. Julia Becker\"\n    }\n  ],\n  \"managingOrganization\": {\n    \"reference\": \"Organization/klinikum-magdeburg\",\n    \"display\": \"Klinikum Magdeburg\"\n  },\n  \"link\": [\n    {\n      \"other\": {\n        \"reference\": \"Patient/emma-hoffmann\",\n        \"display\": \"Emma Marie Hoffmann (Twin Sister)\"\n      },\n      \"type\": \"seealso\"\n    }\n  ]\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create a New Patient_3",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"text\": {\n    \"status\": \"generated\",\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">Elderly patient with extensive medical history</div>\"\n  },\n  \"identifier\": [\n    {\n      \"use\": \"usual\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"MR\",\n            \"display\": \"Medical Record Number\"\n          }\n        ]\n      },\n      \"system\": \"urn:oid:1.2.36.146.595.217.0.1\",\n      \"value\": \"GER-456789\",\n      \"period\": {\n        \"start\": \"1948-11-15\"\n      },\n      \"assigner\": {\n        \"display\": \"St. Elisabeth Hospital\"\n      }\n    },\n    {\n      \"use\": \"official\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"NI\",\n            \"display\": \"National unique individual identifier\"\n          }\n        ]\n      },\n      \"system\": \"http://fhir.de/sid/gkv/kvid-10\",\n      \"value\": \"T123456789\"\n    }\n  ],\n  \"active\": true,\n  \"name\": [\n    {\n      \"use\": \"official\",\n      \"family\": \"Weber\",\n      \"given\": [\"Karl\", \"Heinz\"],\n      \"prefix\": [\"Herr\"]\n    },\n    {\n      \"use\": \"usual\",\n      \"given\": [\"Karl\"]\n    }\n  ],\n  \"telecom\": [\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-391-555-9999\",\n      \"use\": \"home\",\n      \"rank\": 1\n    },\n    {\n      \"system\": \"email\",\n      \"value\": \"karl.weber@example.de\",\n      \"use\": \"home\"\n    }\n  ],\n  \"gender\": \"male\",\n  \"birthDate\": \"1948-11-15\",\n  \"_birthDate\": {\n    \"extension\": [\n      {\n        \"url\": \"http://hl7.org/fhir/StructureDefinition/patient-birthTime\",\n        \"valueDateTime\": \"1948-11-15T03:45:00+01:00\"\n      }\n    ]\n  },\n  \"deceasedBoolean\": false,\n  \"address\": [\n    {\n      \"use\": \"home\",\n      \"type\": \"both\",\n      \"text\": \"Hegelstraße 78, 39104 Magdeburg, Germany\",\n      \"line\": [\"Hegelstraße 78\"],\n      \"city\": \"Magdeburg\",\n      \"district\": \"Stadtfeld Ost\",\n      \"state\": \"Saxony-Anhalt\",\n      \"postalCode\": \"39104\",\n      \"country\": \"DE\",\n      \"period\": {\n        \"start\": \"1985-06-01\"\n      }\n    },\n    {\n      \"use\": \"old\",\n      \"type\": \"both\",\n      \"line\": [\"Leipziger Straße 12\"],\n      \"city\": \"Halle (Saale)\",\n      \"state\": \"Saxony-Anhalt\",\n      \"postalCode\": \"06108\",\n      \"country\": \"DE\",\n      \"period\": {\n        \"start\": \"1948-11-15\",\n        \"end\": \"1985-05-31\"\n      }\n    }\n  ],\n  \"maritalStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/v3-MaritalStatus\",\n        \"code\": \"W\",\n        \"display\": \"Widowed\"\n      }\n    ]\n  },\n  \"multipleBirthBoolean\": false,\n  \"photo\": [\n    {\n      \"contentType\": \"image/jpeg\",\n      \"url\": \"https://example.org/patient-karl-photo.jpg\",\n      \"title\": \"Patient Photo 2025\"\n    }\n  ],\n  \"contact\": [\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n              \"code\": \"C\",\n              \"display\": \"Emergency Contact\"\n            }\n          ]\n        },\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n              \"code\": \"DAUC\",\n              \"display\": \"daughter\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Fischer\",\n        \"given\": [\"Petra\"]\n      },\n      \"telecom\": [\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-391-555-4444\",\n          \"use\": \"mobile\"\n        },\n        {\n          \"system\": \"email\",\n          \"value\": \"petra.fischer@example.de\"\n        }\n      ],\n      \"address\": {\n        \"use\": \"home\",\n        \"line\": [\"Otto-von-Guericke-Straße 99\"],\n        \"city\": \"Magdeburg\",\n        \"state\": \"Saxony-Anhalt\",\n        \"postalCode\": \"39104\",\n        \"country\": \"DE\"\n      },\n      \"gender\": \"female\"\n    },\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n              \"code\": \"N\",\n              \"display\": \"Next-of-Kin\"\n            }\n          ]\n        },\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n              \"code\": \"SONC\",\n              \"display\": \"son\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Weber\",\n        \"given\": [\"Markus\"]\n      },\n      \"telecom\": [\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-30-555-1111\",\n          \"use\": \"mobile\"\n        },\n        {\n          \"system\": \"email\",\n          \"value\": \"markus.weber@example.de\"\n        }\n      ],\n      \"address\": {\n        \"use\": \"home\",\n        \"line\": [\"Friedrichstraße 200\"],\n        \"city\": \"Berlin\",\n        \"postalCode\": \"10117\",\n        \"country\": \"DE\"\n      },\n      \"gender\": \"male\"\n    }\n  ],\n  \"communication\": [\n    {\n      \"language\": {\n        \"coding\": [\n          {\n            \"system\": \"urn:ietf:bcp:47\",\n            \"code\": \"de\",\n            \"display\": \"German\"\n          }\n        ],\n        \"text\": \"German\"\n      },\n      \"preferred\": true\n    }\n  ],\n  \"generalPractitioner\": [\n    {\n      \"reference\": \"Practitioner/geriatric-002\",\n      \"display\": \"Dr. med. Friedrich Müller\"\n    }\n  ],\n  \"managingOrganization\": {\n    \"reference\": \"Organization/st-elisabeth-hospital\",\n    \"display\": \"St. Elisabeth Hospital Magdeburg\"\n  }\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create a New Patient_4",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\" : \"Patient\",\n  // from Resource: id, meta, implicitRules, and language\n  // from DomainResource: text, contained, extension, and modifierExtension\n  \"identifier\" : [{\n    \"use\" : \"usual\",\n    \"type\" : {\n      \"coding\" : [{\n        \"system\" : \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n        \"code\" : \"MR\",\n        \"display\" : \"Medical Record Number\"\n      }]\n    },\n    \"system\" : \"urn:oid:1.2.276.0.76.4.307\",\n    \"value\" : \"ESS-001\",\n    \"assigner\" : {\n      \"display\" : \"Universitätsklinikum Essen\"\n    }\n  }],\n  \"active\" : true,\n  \"name\" : [{\n    \"use\" : \"official\",\n    \"family\" : \"Schmidt\",\n    \"given\" : [\"Anna\", \"Maria\"],\n    \"prefix\" : [\"Dr.\"]\n  }],\n  \"telecom\" : [{\n    \"system\" : \"phone\",\n    \"value\" : \"+49-201-7234567\",\n    \"use\" : \"work\"\n  }, {\n    \"system\" : \"email\",\n    \"value\" : \"anna.schmidt@uni-essen.de\",\n    \"use\" : \"work\"\n  }],\n  \"gender\" : \"female\",\n  \"birthDate\" : \"1985-03-15\",\n  // deceased[x]: Indicates if the individual is deceased or not. One of these 2:\n  \"deceasedBoolean\" : false,\n  \"address\" : [{\n    \"use\" : \"home\",\n    \"type\" : \"both\",\n    \"line\" : [\"Huyssenallee 42\", \"Apartment 3A\"],\n    \"city\" : \"Essen\",\n    \"district\" : \"Südviertel\",\n    \"state\" : \"Nordrhein-Westfalen\",\n    \"postalCode\" : \"45128\",\n    \"country\" : \"DE\"\n  }],\n  \"maritalStatus\" : {\n    \"coding\" : [{\n      \"system\" : \"http://terminology.hl7.org/CodeSystem/v3-MaritalStatus\",\n      \"code\" : \"M\",\n      \"display\" : \"Married\"\n    }]\n  },\n  // multipleBirth[x]: Whether patient is part of a multiple birth. One of these 2:\n  \"multipleBirthBoolean\" : false,\n  \"photo\" : [{\n    \"contentType\" : \"image/jpeg\",\n    \"url\" : \"https://example.org/patient-anna-essen.jpg\",\n    \"title\" : \"Patient Photo Essen 2026\"\n  }],\n  \"contact\" : [{\n    // A contact party (e.g. guardian, partner, friend) for the patient\n    \"relationship\" : [{\n      \"coding\" : [{\n        \"system\" : \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n        \"code\" : \"HUSB\",\n        \"display\" : \"husband\"\n      }]\n    }],\n    \"name\" : {\n      \"use\" : \"official\",\n      \"family\" : \"Schmid\",\n      \"given\" : [\"Thomas\"]\n    },\n    \"telecom\" : [{\n      \"system\" : \"phone\",\n      \"value\" : \"+49-171-1234567\",\n      \"use\" : \"mobile\"\n    }],\n    \"address\" : {\n      \"use\" : \"home\",\n      \"line\" : [\"Huyssenallee 42\"],\n      \"city\" : \"Essen\",\n      \"state\" : \"Nordrhein-Westfalen\",\n      \"postalCode\" : \"45128\",\n      \"country\" : \"DE\"\n    },\n    \"gender\" : \"male\"\n  }],\n  \"communication\" : [{\n    // A language which may be used to communicate with the patient about his or her health\n    \"language\" : {\n      \"coding\" : [{\n        \"system\" : \"urn:ietf:bcp:47\",\n        \"code\" : \"de-DE\",\n        \"display\" : \"German (Germany)\"\n      }],\n      \"text\" : \"Deutsch\"\n    },\n    \"preferred\" : true\n  }],\n  \"generalPractitioner\" : [{\n    \"reference\" : \"Practitioner/essen-gp-001\",\n    \"display\" : \"Dr. med. Sabine Klein\"\n  }],\n  \"managingOrganization\" : {\n    \"reference\" : \"Organization/uni-klinikum-essen\",\n    \"display\" : \"Universitätsklinikum Essen\"\n  },\n  \"link\" : [{\n    // Link to another patient resource that concerns the same actual person\n    \"other\" : {\n      \"reference\" : \"RelatedPerson/anna-husband-essen\"\n    },\n    \"type\" : \"seealso\"\n  }]\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create a New Patient_5",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2026-02-10T13:00:00Z\"\n  },\n  \"text\": {\n    \"status\": \"generated\",\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Julia Hoffmann</b> (Frau)</p><p><b>Id:</b> ESS-TEST003 (MRN bei <span>Alfried Krupp Krankenhaus Essen</span>)</p><p><b>Aktiv:</b> true</p><p><b>Geschlecht:</b> weiblich</p><p><b>Geburtsdatum:</b> 8. November 1992</p><p><b>Adresse:</b> Alfredstraße 9, 45130 Essen, Germany</p><p><b>Telefon:</b> +49-201-6543210</p><p><b>Email:</b> <a href=\\\"mailto:julia.hoffmann@web.de\\\">julia.hoffmann@web.de</a></p><p><b>Familienstand:</b> ledig</p></div>\"\n  },\n  \"identifier\": [\n    {\n      \"use\": \"usual\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"MR\",\n            \"display\": \"Medical Record Number\"\n          }\n        ]\n      },\n      \"system\": \"urn:oid:1.2.276.0.76.4.309\",\n      \"value\": \"ESS-TEST003\",\n      \"period\": {\n        \"start\": \"2026-02-10\"\n      },\n      \"assigner\": {\n        \"display\": \"Alfried Krupp Krankenhaus Essen\"\n      }\n    },\n    {\n      \"use\": \"official\",\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"NI\",\n            \"display\": \"National unique individual identifier\"\n          }\n        ]\n      },\n      \"system\": \"http://fhir.de/sid/gkv/kvid-10\",\n      \"value\": \"J223344556\"\n    }\n  ],\n  \"active\": true,\n  \"name\": [\n    {\n      \"use\": \"official\",\n      \"family\": \"Hoffmann\",\n      \"given\": [\"Julia\", \"Sophie\"],\n      \"prefix\": [\"Frau\"]\n    },\n    {\n      \"use\": \"usual\",\n      \"family\": \"Hoffmann\",\n      \"given\": [\"Julia\"]\n    }\n  ],\n  \"telecom\": [\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-201-6543210\",\n      \"use\": \"home\",\n      \"rank\": 1\n    },\n    {\n      \"system\": \"phone\",\n      \"value\": \"+49-176-8889999\",\n      \"use\": \"mobile\",\n      \"rank\": 1\n    },\n    {\n      \"system\": \"email\",\n      \"value\": \"julia.hoffmann@web.de\",\n      \"use\": \"home\"\n    }\n  ],\n  \"gender\": \"female\",\n  \"birthDate\": \"1992-11-08\",\n  \"_birthDate\": {\n    \"extension\": [\n      {\n        \"url\": \"http://hl7.org/fhir/StructureDefinition/patient-birthTime\",\n        \"valueDateTime\": \"1992-11-08T11:20:00+01:00\"\n      }\n    ]\n  },\n  \"deceasedBoolean\": false,\n  \"address\": [\n    {\n      \"use\": \"home\",\n      \"type\": \"both\",\n      \"text\": \"Alfredstraße 9, 45130 Essen, Germany\",\n      \"line\": [\"Alfredstraße 9\"],\n      \"city\": \"Essen\",\n      \"district\": \"Rüttenscheid\",\n      \"state\": \"Nordrhein-Westfalen\",\n      \"postalCode\": \"45130\",\n      \"country\": \"DE\",\n      \"period\": {\n        \"start\": \"2018-09-01\"\n      }\n    }\n  ],\n  \"maritalStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/v3-MaritalStatus\",\n        \"code\": \"S\",\n        \"display\": \"Never Married\"\n      }\n    ]\n  },\n  \"multipleBirthBoolean\": false,\n  \"contact\": [\n    {\n      \"relationship\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n              \"code\": \"C\",\n              \"display\": \"Emergency Contact\"\n            }\n          ]\n        },\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n              \"code\": \"MTH\",\n              \"display\": \"mother\"\n            }\n          ]\n        }\n      ],\n      \"name\": {\n        \"use\": \"official\",\n        \"family\": \"Hoffmann\",\n        \"given\": [\"Monika\"]\n      },\n      \"telecom\": [\n        {\n          \"system\": \"phone\",\n          \"value\": \"+49-201-5556666\",\n          \"use\": \"home\"\n        }\n      ],\n      \"address\": {\n        \"use\": \"home\",\n        \"line\": [\"Bredeney Straße 45\"],\n        \"city\": \"Essen\",\n        \"state\": \"Nordrhein-Westfalen\",\n        \"postalCode\": \"45133\",\n        \"country\": \"DE\"\n      },\n      \"gender\": \"female\"\n    }\n  ],\n  \"communication\": [\n    {\n      \"language\": {\n        \"coding\": [\n          {\n            \"system\": \"urn:ietf:bcp:47\",\n            \"code\": \"de-DE\",\n            \"display\": \"German (Germany)\"\n          }\n        ],\n        \"text\": \"Deutsch\"\n      },\n      \"preferred\": true\n    }\n  ],\n  \"generalPractitioner\": [\n    {\n      \"reference\": \"Practitioner/essen-gp-003\",\n      \"display\": \"Dr. med. Petra Wagner\"\n    }\n  ],\n  \"managingOrganization\": {\n    \"reference\": \"Organization/krupp-krankenhaus-essen\",\n    \"display\": \"Alfried Krupp Krankenhaus Essen\"\n  }\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Patient_1",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"id\": \"184858c7-ea8a-4d92-9af8-ab44c4eb34d9/_history\",\n  \"name\": [{\"family\": \"Karl X\"}]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/184858c7-ea8a-4d92-9af8-ab44c4eb34d9",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "184858c7-ea8a-4d92-9af8-ab44c4eb34d9"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Patient_2",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"id\": \"6b682e4b-826c-4a79-9be7-e6384e2b8961\",\n  \"name\": [{\"family\": \"Weber VI\"}]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/f7bf0a86-2e73-4d0a-a332-f060d3a61473",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "f7bf0a86-2e73-4d0a-a332-f060d3a61473"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Patient_3",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Patient\",\n  \"id\": \"6b682e4b-826c-4a79-9be7-e6384e2b8961\",\n  \"name\": [{\"family\": \"Schulz\"}]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/4e3984ed-bace-468f-85bd-a7c1051000c0",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "4e3984ed-bace-468f-85bd-a7c1051000c0"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Patient_1 by ID",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/8b21c568-1f4d-4dd2-aec2-de95b6e8b5b2",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "8b21c568-1f4d-4dd2-aec2-de95b6e8b5b2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Patient_2 by ID",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/8fbbe091-7b67-4df6-86aa-3d4dbc070d8e",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "8fbbe091-7b67-4df6-86aa-3d4dbc070d8e"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Patient_1 history",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/184858c7-ea8a-4d92-9af8-ab44c4eb34d9/_history",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "184858c7-ea8a-4d92-9af8-ab44c4eb34d9",
+            "_history"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Patient_2 history",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/994edd2c-dd97-484e-a193-690cbb55cd7f/_history",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "994edd2c-dd97-484e-a193-690cbb55cd7f",
+            "_history"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Patient_3 history",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient/6b682e4b-826c-4a79-9be7-e6384e2b8961/_history",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient",
+            "6b682e4b-826c-4a79-9be7-e6384e2b8961",
+            "_history"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search Patient by name",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient?name=Schmidt",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "Schmidt"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search Patient by substring of the name",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient?gender=male&_count=10&name:contains=Hoff",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ],
+          "query": [
+            {
+              "key": "gender",
+              "value": "male"
+            },
+            {
+              "key": "_count",
+              "value": "10"
+            },
+            {
+              "key": "name:contains",
+              "value": "Hoff"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search for Patient using alternative parameters.",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse the response",
+              "const response = pm.response.json();",
+              "",
+              "// Calculate age from birthDate",
+              "function calculateAge(birthDate) {",
+              "    if (!birthDate) return null;",
+              "    const today = new Date();",
+              "    const birth = new Date(birthDate);",
+              "    let age = today.getFullYear() - birth.getFullYear();",
+              "    const monthDiff = today.getMonth() - birth.getMonth();",
+              "    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {",
+              "        age--;",
+              "    }",
+              "    return age;",
+              "}",
+              "",
+              "// Get age group bucket",
+              "function getAgeGroup(age) {",
+              "    if (age === null) return 'Unknown';",
+              "    if (age <= 17) return '0-17';",
+              "    if (age <= 44) return '18-44';",
+              "    if (age <= 64) return '45-64';",
+              "    return '65+';",
+              "}",
+              "",
+              "// Process patients",
+              "const ageGroups = { '0-17': 0, '18-44': 0, '45-64': 0, '65+': 0 };",
+              "const cityCounts = {};",
+              "",
+              "if (response.entry && Array.isArray(response.entry)) {",
+              "    response.entry.forEach(entry => {",
+              "        const patient = entry.resource;",
+              "        ",
+              "        // Process age",
+              "        if (patient && patient.birthDate) {",
+              "            const age = calculateAge(patient.birthDate);",
+              "            const ageGroup = getAgeGroup(age);",
+              "            if (ageGroups.hasOwnProperty(ageGroup)) {",
+              "                ageGroups[ageGroup]++;",
+              "            }",
+              "        }",
+              "        ",
+              "        // Process city (use first address if present)",
+              "        if (patient && patient.address && patient.address.length > 0 && patient.address[0].city) {",
+              "            const city = patient.address[0].city;",
+              "            cityCounts[city] = (cityCounts[city] || 0) + 1;",
+              "        }",
+              "    });",
+              "}",
+              "",
+              "// Prepare data for visualization",
+              "const ageLabels = Object.keys(ageGroups);",
+              "const ageData = Object.values(ageGroups);",
+              "const cityLabels = Object.keys(cityCounts);",
+              "const cityData = Object.values(cityCounts);",
+              "",
+              "// Visualization template",
+              "var template = `",
+              "<h2 style=\"font-family: Arial, sans-serif; color: #333;\">Patient Demographics</h2>",
+              "<div style=\"display: flex; flex-wrap: wrap; justify-content: space-around; padding: 20px;\">",
+              "    <div style=\"width: 45%; min-width: 300px; margin-bottom: 20px;\">",
+              "        <h3 style=\"font-family: Arial, sans-serif; color: #555; text-align: center;\">Age Distribution</h3>",
+              "        <canvas id=\"ageChart\" height=\"250\"></canvas>",
+              "    </div>",
+              "    <div style=\"width: 45%; min-width: 300px; margin-bottom: 20px;\">",
+              "        <h3 style=\"font-family: Arial, sans-serif; color: #555; text-align: center;\">Patients by City</h3>",
+              "        <canvas id=\"cityChart\" height=\"250\"></canvas>",
+              "    </div>",
+              "</div>",
+              "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js\"></script>",
+              "<script>",
+              "    pm.getData(function (err, value) {",
+              "        // Age Distribution Bar Chart",
+              "        var ageCtx = document.getElementById(\"ageChart\").getContext(\"2d\");",
+              "        new Chart(ageCtx, {",
+              "            type: \"bar\",",
+              "            data: {",
+              "                labels: value.ageLabels,",
+              "                datasets: [{",
+              "                    label: \"Number of Patients\",",
+              "                    data: value.ageData,",
+              "                    backgroundColor: [",
+              "                        \"rgba(54, 162, 235, 0.7)\",",
+              "                        \"rgba(75, 192, 192, 0.7)\",",
+              "                        \"rgba(255, 206, 86, 0.7)\",",
+              "                        \"rgba(255, 99, 132, 0.7)\"",
+              "                    ],",
+              "                    borderColor: [",
+              "                        \"rgba(54, 162, 235, 1)\",",
+              "                        \"rgba(75, 192, 192, 1)\",",
+              "                        \"rgba(255, 206, 86, 1)\",",
+              "                        \"rgba(255, 99, 132, 1)\"",
+              "                    ],",
+              "                    borderWidth: 1",
+              "                }]",
+              "            },",
+              "            options: {",
+              "                legend: { display: false },",
+              "                title: {",
+              "                    display: true,",
+              "                    text: \"Age Groups\"",
+              "                },",
+              "                scales: {",
+              "                    yAxes: [{",
+              "                        ticks: {",
+              "                            beginAtZero: true,",
+              "                            stepSize: 1",
+              "                        },",
+              "                        scaleLabel: {",
+              "                            display: true,",
+              "                            labelString: \"Count\"",
+              "                        }",
+              "                    }],",
+              "                    xAxes: [{",
+              "                        scaleLabel: {",
+              "                            display: true,",
+              "                            labelString: \"Age Group\"",
+              "                        }",
+              "                    }]",
+              "                }",
+              "            }",
+              "        });",
+              "",
+              "        // City Distribution Pie Chart",
+              "        var cityCtx = document.getElementById(\"cityChart\").getContext(\"2d\");",
+              "        new Chart(cityCtx, {",
+              "            type: \"pie\",",
+              "            data: {",
+              "                labels: value.cityLabels,",
+              "                datasets: [{",
+              "                    data: value.cityData,",
+              "                    backgroundColor: [",
+              "                        \"rgba(255, 99, 132, 0.7)\",",
+              "                        \"rgba(54, 162, 235, 0.7)\",",
+              "                        \"rgba(255, 206, 86, 0.7)\",",
+              "                        \"rgba(75, 192, 192, 0.7)\",",
+              "                        \"rgba(153, 102, 255, 0.7)\",",
+              "                        \"rgba(255, 159, 64, 0.7)\"",
+              "                    ],",
+              "                    borderColor: [",
+              "                        \"rgba(255, 99, 132, 1)\",",
+              "                        \"rgba(54, 162, 235, 1)\",",
+              "                        \"rgba(255, 206, 86, 1)\",",
+              "                        \"rgba(75, 192, 192, 1)\",",
+              "                        \"rgba(153, 102, 255, 1)\",",
+              "                        \"rgba(255, 159, 64, 1)\"",
+              "                    ],",
+              "                    borderWidth: 1",
+              "                }]",
+              "            },",
+              "            options: {",
+              "                legend: {",
+              "                    display: true,",
+              "                    position: \"bottom\"",
+              "                },",
+              "                title: {",
+              "                    display: true,",
+              "                    text: \"Distribution by City\"",
+              "                }",
+              "            }",
+              "        });",
+              "    });",
+              "</script>",
+              "`;",
+              "",
+              "// Set the visualizer",
+              "pm.visualizer.set(template, {",
+              "    ageLabels: ageLabels,",
+              "    ageData: ageData,",
+              "    cityLabels: cityLabels,",
+              "    cityData: cityData",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "\tapplication/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/fhir/Patient?name=Hoffmann&birthdate=2009-04-20&gender=male",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "fhir",
+            "Patient"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "Hoffmann"
+            },
+            {
+              "key": "birthdate",
+              "value": "2009-04-20"
+            },
+            {
+              "key": "gender",
+              "value": "male"
+            },
+            {
+              "key": "_count",
+              "value": "5",
+              "disabled": true
+            },
+            {
+              "key": "_offset",
+              "value": "2",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+# fhir_extension extension
+comment = 'FHIR Patient resource management extension'
+default_version = '0.1.0'
+module_pathname = '$libdir/fhir_extension'
+relocatable = false
+superuser = false
