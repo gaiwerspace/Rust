@@ -57,9 +57,9 @@ JSONB Patient Records
 - OperationOutcome for error responses
 - Proper metadata handling (version, timestamps)
 
-## 📊 Server Details
+## Server Details
 
-- **Language**: Rust 1.70+
+- **Language**: Rust 1.93+
 - **Web Framework**: Axum with Tokio async runtime
 - **Database**: PostgreSQL 16 with JSONB storage
 - **API Port**: 3000
@@ -461,6 +461,7 @@ See [SETUP.md](SETUP.md) for detailed troubleshooting guide including:
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [Axum Framework](https://docs.rs/axum/)
 - [SQLx Database Library](https://github.com/launchbadge/sqlx)
+- [Rust Programming Language](https://rust-lang.org)
 
 ## Implementation Notes
 
@@ -560,7 +561,7 @@ curl -X POST http://localhost:3000/fhir/Patient \
       "given": ["Carl"]
     }],
     "gender": "male",
-    "birthDate": "1990-01-01"
+    "birthDate": "1980-01-01"
   }'
 ```
 
