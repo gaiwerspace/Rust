@@ -37,7 +37,6 @@ pub struct HumanName {
     pub given: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<String>,
-
     #[serde(flatten, skip_serializing_if = "Map::is_empty", default)]
     pub extra: Map<String, Value>,
 }

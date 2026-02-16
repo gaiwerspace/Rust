@@ -96,83 +96,21 @@ impl Database {
         // Parse UUID
         let patient_uuid = Uuid::parse_str(id)?;
 
-        // Get existing patient first to verify it exists and merge data
-        let existing = match self.get_patient(id).await? {
-            Some(p) => p,
-            None => return Ok(None),
-        };
-
-        // Helper to merge the `name` field without losing existing entries.
-        // Strategy:
-        // - If no new names are provided, keep existing as-is
-        // - If new names are provided:
-        //   - If a name has a `use` value (flattened into `extra["use"]`),
-        //     it replaces the existing name with the same `use`
-        //   - Names with a new `use` (or without `use`) are appended
-        fn merge_names(
-            existing: Option<Vec<crate::models::HumanName>>,
-            incoming: Option<Vec<crate::models::HumanName>>,
-        ) -> Option<Vec<crate::models::HumanName>> {
-            use std::collections::HashMap;
-
-            // If nothing new is provided, keep what we had
-            let Some(incoming_list) = incoming else {
-                return existing;
-            };
-
-            // If only new names exist, just take them
-            let Some(mut existing_list) = existing else {
-                return Some(incoming_list);
-            };
-
-            // Index existing names by `use` (if present)
-            fn extract_use(name: &crate::models::HumanName) -> Option<String> {
-                name.extra
-                    .get("use")
-                    .and_then(|v| v.as_str().map(|s| s.to_string()))
-            }
-
-            let mut index_by_use: HashMap<String, usize> = HashMap::new();
-            for (idx, n) in existing_list.iter().enumerate() {
-                if let Some(u) = extract_use(n) {
-                    index_by_use.entry(u).or_insert(idx);
-                }
-            }
-
-            // Merge: replace by `use` where possible, otherwise append
-            for new_name in incoming_list {
-                if let Some(u) = extract_use(&new_name) {
-                    if let Some(&idx) = index_by_use.get(&u) {
-                        existing_list[idx] = new_name;
-                        continue;
-                    }
-                }
-                existing_list.push(new_name);
-            }
-
-            Some(existing_list)
+        // Check if patient exists (standard PUT requires known ID for update if we treat it as update)
+        // If it doesn't exist, we could create it (upsert), but here we stick to update semantics for simplicity
+        // matching the previous behavior's check.
+        if (self.get_patient(id).await?).is_none() {
+            return Ok(None);
         }
 
-        // Merge the update with existing data (update takes precedence for non-None fields)
-        let merged_patient = Patient {
-            id: Some(id.to_string()),
-            resource_type: "Patient".to_string(),
-            meta: None, // Will be set from database
-            name: merge_names(existing.name, patient.name),
-            gender: if patient.gender.is_some() { patient.gender } else { existing.gender },
-            birth_date: if patient.birth_date.is_some() { patient.birth_date } else { existing.birth_date },
-            extra: {
-                // Merge extra fields - existing fields preserved, new fields added
-                let mut merged_extra = existing.extra;
-                for (key, value) in patient.extra {
-                    merged_extra.insert(key, value);
-                }
-                merged_extra
-            },
-        };
+        // Standard FHIR PUT: The new resource REPLACES the existing resource.
+        // We do NOT merge fields.
+        let mut p = patient;
+        p.id = Some(id.to_string());
+        p.resource_type = "Patient".to_string();
+        // meta is handled by DB return values
 
-        // Update in database and increment version
-        let patient_json = serde_json::to_value(&merged_patient)?;
+        let patient_json = serde_json::to_value(&p)?;
 
         let result = sqlx::query(
             "UPDATE fhir_resources
@@ -189,7 +127,7 @@ impl Database {
         let last_updated: chrono::DateTime<chrono::Utc> = result.get("last_updated");
 
         // Build the complete updated patient with metadata
-        let mut updated_patient = merged_patient;
+        let mut updated_patient = p;
         updated_patient.meta = Some(crate::models::Meta {
             version_id: Some(version_id.to_string()),
             last_updated: Some(last_updated),
@@ -606,7 +544,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_update_patient_merges_data() {
+    async fn test_update_patient_replaces_data() {
         let db = setup_test_db().await;
         let original = create_test_patient("Gauß", "Carl", "male", "1990-01-01");
         let created = db.create_patient(original).await.unwrap();
@@ -627,7 +565,9 @@ mod tests {
 
         let updated = result.unwrap().unwrap();
         assert_eq!(updated.gender, Some("female".to_string()));
-        assert_eq!(updated.birth_date, Some("1990-01-01".to_string()));
+        // In replacement semantics, fields not provided in the update are removed (if they are optional)
+        assert!(updated.birth_date.is_none());
+        assert!(updated.name.is_none());
     }
 
     #[tokio::test]
@@ -682,6 +622,7 @@ mod tests {
 
         let updated = db.update_patient(&patient_id, update).await.unwrap().unwrap();
         assert_eq!(updated.gender.as_ref().unwrap(), "other");
-        assert!(updated.extra.contains_key("identifier"));
+        // Replacement semantics means identifier (part of extra) is lost if not provided
+        assert!(!updated.extra.contains_key("identifier"));
     }
 }
