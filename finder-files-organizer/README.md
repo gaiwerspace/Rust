@@ -73,6 +73,11 @@ Recursively sort all folders in YOUR_SELECTED_FOLDER by type:
 
 ./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -r
 
+Recursively sort all folders in YOUR_SELECTED_FOLDER by type with multithreading (8 threads):
+
+./target/release/finder-files-organizer /YOUR_SELECTED_FOLDER -r  --threads 8
+
+
 Examples (sorting the folders and files in the folder Downloads):
 
 Sort by name (no tags needed):
@@ -104,3 +109,13 @@ Please grant it the following rights:
 Grant access to this application in Privacy & Security settings, located in System Settings. -> click on button "Open System Settings"
 
 4. Please grant Accessibility Access to the application that runs this program (e.g., Terminal).
+
+
+Compiling the script for MacOS:
+Apple Silicon (M1/M2/M3)
+chmod +x scripts/create_dmg.sh
+./scripts/create_dmg.sh --target aarch64-apple-darwin
+
+Intel (x86_64)
+chmod +x scripts/create_dmg.sh
+./scripts/create_dmg.sh --target x86_64-apple-darwin

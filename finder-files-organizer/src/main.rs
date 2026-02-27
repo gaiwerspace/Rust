@@ -4,7 +4,11 @@ use std::io;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{mpsc, Arc, Mutex};
 use std::time::Instant;
+
+mod thread_pool;
 
 // ============================================================================
 // Enums
@@ -83,6 +87,10 @@ struct Args {
     /// WARNING: This changes the folder structure! Organize files into folders by extension
     #[arg(long)]
     pack_to_folders: bool,
+
+    /// Number of worker threads to use for parallel processing (1-1024)
+    #[arg(short = 'j', long = "threads", value_name = "COUNT")]
+    threads: Option<usize>,
 }
 
 fn parse_path(s: &str) -> Result<PathBuf, String> {
@@ -94,6 +102,42 @@ fn parse_path(s: &str) -> Result<PathBuf, String> {
         PathBuf::from(s)
     };
     Ok(path)
+}
+
+// ============================================================================
+// Thread Pool Configuration
+// ============================================================================
+
+/// Configuration for the thread pool with validation
+struct ThreadPoolConfig {
+    thread_count: usize,
+    verbose: bool,
+}
+
+impl ThreadPoolConfig {
+    /// Create a ThreadPoolConfig from command-line arguments
+    ///
+    /// # Arguments
+    /// * `args` - Parsed command-line arguments
+    ///
+    /// # Returns
+    /// * `Ok(ThreadPoolConfig)` - Valid configuration
+    /// * `Err(String)` - Error message if thread count is invalid
+    fn from_args(args: &Args) -> Result<Self, String> {
+        let thread_count = args.threads.unwrap_or_else(num_cpus::get);
+        
+        if thread_count < 1 || thread_count > 1024 {
+            return Err(format!(
+                "Thread count must be between 1 and 1024, got {}",
+                thread_count
+            ));
+        }
+        
+        Ok(ThreadPoolConfig {
+            thread_count,
+            verbose: args.verbose,
+        })
+    }
 }
 
 // ============================================================================
@@ -406,6 +450,40 @@ impl FileOrganizer {
         Ok((total_moved, total_skipped))
     }
 
+    fn organize_recursive_with_threads(
+        &self,
+        root: &Path,
+        thread_count: usize,
+    ) -> Result<(usize, usize), String> {
+        if thread_count <= 1 {
+            return self.organize_recursive(root);
+        }
+
+        let mut total_moved = 0;
+        let mut total_skipped = 0;
+
+        let directories = self.get_all_directories(root)?;
+        eprintln!(
+            "Processing {} director{}...",
+            directories.len(),
+            if directories.len() == 1 { "y" } else { "ies" }
+        );
+
+        for (index, dir) in directories.iter().enumerate() {
+            eprintln!(
+                "[{}/{}] Organizing: {}",
+                index + 1,
+                directories.len(),
+                dir.display()
+            );
+            let (moved, skipped) = self.organize_with_threads(dir, thread_count)?;
+            total_moved += moved;
+            total_skipped += skipped;
+        }
+
+        Ok((total_moved, total_skipped))
+    }
+
     /// Get all directories recursively, except symlinks, to stop the cycle
     fn get_all_directories(&self, root: &Path) -> Result<Vec<PathBuf>, String> {
         let mut directories = Vec::with_capacity(16);
@@ -509,6 +587,191 @@ impl FileOrganizer {
         Ok((files_moved, files_skipped))
     }
 
+    fn organize_with_threads(
+        &self,
+        dir_path: &Path,
+        thread_count: usize,
+    ) -> Result<(usize, usize), String> {
+        if thread_count <= 1 {
+            return self.organize(dir_path);
+        }
+
+        if !dir_path.exists() {
+            return Err(format!(
+                "Directory \"{}\" doesn't exist",
+                dir_path.display()
+            ));
+        }
+
+        if !dir_path.is_dir() {
+            return Err(format!(
+                "Path \"{}\" is not a directory",
+                dir_path.display()
+            ));
+        }
+
+        let entries = fs::read_dir(dir_path)
+            .map_err(|e| format!("Error opening directory \"{}\": {}", dir_path.display(), e))?;
+
+        let mut files_to_process: Vec<PathBuf> = Vec::with_capacity(64);
+        let mut files_skipped = 0usize;
+
+        for entry in entries {
+            let file = entry.map_err(|e| format!("Error reading directory entry: {}", e))?;
+            let file_path = file.path();
+
+            if file_path.is_dir() {
+                self.log(format!("Skipping directory: {}", file_path.display()));
+                files_skipped += 1;
+                continue;
+            }
+
+            if file_path.extension().and_then(|e| e.to_str()).is_none() {
+                self.log(format!(
+                    "Skipping file without extension: {}",
+                    file_path.display()
+                ));
+                files_skipped += 1;
+                continue;
+            }
+
+            files_to_process.push(file_path);
+        }
+
+        if files_to_process.is_empty() {
+            return Ok((0, files_skipped));
+        }
+
+        let moved = Arc::new(AtomicUsize::new(0));
+        let skipped = Arc::new(AtomicUsize::new(files_skipped));
+        let first_error: Arc<Mutex<Option<String>>> = Arc::new(Mutex::new(None));
+
+        let (tx, rx) = mpsc::channel::<PathBuf>();
+        let rx = Arc::new(Mutex::new(rx));
+        let dir_path = Arc::new(dir_path.to_path_buf());
+        let verbose = self.verbose;
+
+        let mut workers = Vec::with_capacity(thread_count);
+        for _ in 0..thread_count {
+            let rx = Arc::clone(&rx);
+            let moved = Arc::clone(&moved);
+            let skipped = Arc::clone(&skipped);
+            let first_error = Arc::clone(&first_error);
+            let dir_path = Arc::clone(&dir_path);
+
+            workers.push(std::thread::spawn(move || loop {
+                let job = {
+                    let rx = rx.lock().unwrap();
+                    rx.recv()
+                };
+
+                let file_path = match job {
+                    Ok(p) => p,
+                    Err(_) => break,
+                };
+
+                if first_error.lock().unwrap().is_some() {
+                    break;
+                }
+
+                let extension = match file_path.extension().and_then(|e| e.to_str()) {
+                    Some(ext) => ext.to_lowercase(),
+                    None => {
+                        skipped.fetch_add(1, Ordering::Relaxed);
+                        continue;
+                    }
+                };
+
+                let extension_dir = dir_path.join(&extension);
+                if let Err(e) = Self::create_dir_if_not_exists(&extension_dir) {
+                    *first_error.lock().unwrap() = Some(e);
+                    break;
+                }
+
+                let filename = match file_path.file_name() {
+                    Some(name) => name.to_owned(),
+                    None => {
+                        skipped.fetch_add(1, Ordering::Relaxed);
+                        continue;
+                    }
+                };
+
+                let mut destination = extension_dir.join(&filename);
+
+                let mut moved_ok = false;
+                for _ in 0..10000 {
+                    match fs::rename(&file_path, &destination) {
+                        Ok(_) => {
+                            moved_ok = true;
+                            break;
+                        }
+                        Err(err) => {
+                            if err.kind() == io::ErrorKind::AlreadyExists {
+                                match Self::get_unique_filename(&extension_dir, &filename) {
+                                    Ok(new_dest) => {
+                                        destination = new_dest;
+                                        continue;
+                                    }
+                                    Err(e) => {
+                                        *first_error.lock().unwrap() = Some(e);
+                                        break;
+                                    }
+                                }
+                            } else if destination.exists() {
+                                match Self::get_unique_filename(&extension_dir, &filename) {
+                                    Ok(new_dest) => {
+                                        destination = new_dest;
+                                        continue;
+                                    }
+                                    Err(e) => {
+                                        *first_error.lock().unwrap() = Some(e);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                *first_error.lock().unwrap() = Some(format!(
+                                    "Error moving \"{}\" to \"{}\": {}",
+                                    file_path.display(),
+                                    destination.display(),
+                                    err
+                                ));
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if moved_ok {
+                    moved.fetch_add(1, Ordering::Relaxed);
+                    if verbose {
+                        eprintln!("Moved: {}", file_path.display());
+                    }
+                } else if first_error.lock().unwrap().is_none() {
+                    skipped.fetch_add(1, Ordering::Relaxed);
+                }
+            }));
+        }
+
+        for file_path in files_to_process {
+            if first_error.lock().unwrap().is_some() {
+                break;
+            }
+            tx.send(file_path)
+                .map_err(|e| format!("Failed to send file job: {e}"))?;
+        }
+        drop(tx);
+
+        for worker in workers {
+            let _ = worker.join();
+        }
+
+        if let Some(err) = first_error.lock().unwrap().take() {
+            return Err(err);
+        }
+
+        Ok((moved.load(Ordering::Relaxed), skipped.load(Ordering::Relaxed)))
+    }
+
     /// Create a unique filename to prevent overwriting
     fn get_unique_filename(dir: &Path, original_name: &std::ffi::OsStr) -> Result<PathBuf, String> {
         let name_str = original_name.to_string_lossy();
@@ -537,9 +800,15 @@ impl FileOrganizer {
     /// Create the directory if it does not exist
     fn create_dir_if_not_exists(dir_path: &Path) -> Result<(), String> {
         if !dir_path.exists() {
-            fs::create_dir(dir_path).map_err(|e| {
-                format!("Error creating directory \"{}\": {}", dir_path.display(), e)
-            })?;
+            if let Err(e) = fs::create_dir_all(dir_path) {
+                if e.kind() != io::ErrorKind::AlreadyExists {
+                    return Err(format!(
+                        "Error creating directory \"{}\": {}",
+                        dir_path.display(),
+                        e
+                    ));
+                }
+            }
         }
         Ok(())
     }
@@ -564,6 +833,9 @@ impl FileOrganizer {
 fn main() -> Result<(), String> {
     let args = Args::parse();
 
+    // Validate thread pool configuration
+    let config = ThreadPoolConfig::from_args(&args)?;
+
     /// Set sorting options (with defaults)
     let sort_by = args.sort.as_ref().unwrap_or(&SortBy::Type);
     let order = args.order.as_ref().unwrap_or(&SortOrder::Asc);
@@ -577,9 +849,9 @@ fn main() -> Result<(), String> {
 
         let (moved, skipped) = if args.recursive {
             eprintln!("Recursive mode enabled - organizing all nested folders\n");
-            organizer.organize_recursive(&args.path)?
+            organizer.organize_recursive_with_threads(&args.path, config.thread_count)?
         } else {
-            organizer.organize(&args.path)?
+            organizer.organize_with_threads(&args.path, config.thread_count)?
         };
 
         eprintln!("\nFiles moved: {}, skipped: {}", moved, skipped);
@@ -754,4 +1026,112 @@ mod tests {
         let unique_name = result.unwrap();
         assert_eq!(unique_name.file_name().unwrap(), "test (1).txt");
     }
+
+    // ThreadPoolConfig tests
+    #[test]
+    fn test_thread_pool_config_valid_thread_count() {
+        let args = Args {
+            path: PathBuf::from("/tmp"),
+            sort: None,
+            order: None,
+            verbose: false,
+            recursive: false,
+            pack_to_folders: false,
+            threads: Some(4),
+        };
+        let config = ThreadPoolConfig::from_args(&args);
+        assert!(config.is_ok());
+        let config = config.unwrap();
+        assert_eq!(config.thread_count, 4);
+        assert_eq!(config.verbose, false);
+    }
+
+    #[test]
+    fn test_thread_pool_config_default_thread_count() {
+        let args = Args {
+            path: PathBuf::from("/tmp"),
+            sort: None,
+            order: None,
+            verbose: true,
+            recursive: false,
+            pack_to_folders: false,
+            threads: None,
+        };
+        let config = ThreadPoolConfig::from_args(&args);
+        assert!(config.is_ok());
+        let config = config.unwrap();
+        assert_eq!(config.thread_count, num_cpus::get());
+        assert_eq!(config.verbose, true);
+    }
+
+    #[test]
+    fn test_thread_pool_config_min_thread_count() {
+        let args = Args {
+            path: PathBuf::from("/tmp"),
+            sort: None,
+            order: None,
+            verbose: false,
+            recursive: false,
+            pack_to_folders: false,
+            threads: Some(1),
+        };
+        let config = ThreadPoolConfig::from_args(&args);
+        assert!(config.is_ok());
+        let config = config.unwrap();
+        assert_eq!(config.thread_count, 1);
+    }
+
+    #[test]
+    fn test_thread_pool_config_max_thread_count() {
+        let args = Args {
+            path: PathBuf::from("/tmp"),
+            sort: None,
+            order: None,
+            verbose: false,
+            recursive: false,
+            pack_to_folders: false,
+            threads: Some(1024),
+        };
+        let config = ThreadPoolConfig::from_args(&args);
+        assert!(config.is_ok());
+        let config = config.unwrap();
+        assert_eq!(config.thread_count, 1024);
+    }
+
+    #[test]
+    fn test_thread_pool_config_invalid_zero() {
+        let args = Args {
+            path: PathBuf::from("/tmp"),
+            sort: None,
+            order: None,
+            verbose: false,
+            recursive: false,
+            pack_to_folders: false,
+            threads: Some(0),
+        };
+        let config = ThreadPoolConfig::from_args(&args);
+        assert!(config.is_err());
+        if let Err(e) = config {
+            assert_eq!(e, "Thread count must be between 1 and 1024, got 0");
+        }
+    }
+
+    #[test]
+    fn test_thread_pool_config_invalid_too_large() {
+        let args = Args {
+            path: PathBuf::from("/tmp"),
+            sort: None,
+            order: None,
+            verbose: false,
+            recursive: false,
+            pack_to_folders: false,
+            threads: Some(1025),
+        };
+        let config = ThreadPoolConfig::from_args(&args);
+        assert!(config.is_err());
+        if let Err(e) = config {
+            assert_eq!(e, "Thread count must be between 1 and 1024, got 1025");
+        }
+    }
 }
+
