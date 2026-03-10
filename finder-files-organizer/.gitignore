@@ -1,2 +1,5 @@
 /target
+/test_directory
 .DS_Store
+.vscode
+.kiro
